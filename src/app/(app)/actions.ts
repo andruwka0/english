@@ -1,7 +1,10 @@
+"use server";
+
 import { redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 
-export default async function Home() {
+export async function logout() {
   const session = await getSession();
-  redirect(session.role ? "/homework" : "/login");
+  session.destroy();
+  redirect("/login");
 }

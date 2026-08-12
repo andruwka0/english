@@ -1,26 +1,39 @@
 @import "tailwindcss";
-
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@plugin "@tailwindcss/typography";
+@import "highlight.js/styles/github-dark.css";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body);
+  --font-heading: var(--font-heading);
   --font-mono: var(--font-geist-mono);
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-cream: #fff8ec;
+  --color-primary: #7c5cfc;
+  --color-primary-dark: #6a3ff0;
+  --color-primary-soft: #ede6ff;
+  --color-pink: #ff6fa5;
+  --color-pink-soft: #ffe4ef;
+  --color-yellow: #ffc845;
+  --color-yellow-soft: #fff3d6;
+  --color-teal: #2fc2b8;
+  --color-teal-soft: #dcfaf6;
+  --color-success: #22c55e;
+  --color-success-soft: #dcfce7;
+  --color-danger: #ff6b6b;
+  --color-danger-soft: #ffe6e6;
+  --color-ink: #372f5c;
+  --color-ink-soft: #7d759c;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background:
+    radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--color-yellow) 22%, transparent) 0%, transparent 40%),
+    radial-gradient(circle at 95% 15%, color-mix(in srgb, var(--color-pink) 18%, transparent) 0%, transparent 42%),
+    radial-gradient(circle at 90% 92%, color-mix(in srgb, var(--color-teal) 20%, transparent) 0%, transparent 45%),
+    var(--color-cream);
+  background-attachment: fixed;
+}
+
+.wiggle-hover:hover {
+  transform: rotate(-1deg) scale(1.03);
 }
