@@ -49,6 +49,7 @@ interface PyodideInterface {
 }
 
 interface PyProxyDict {
+  set(key: string, value: unknown): void;
   destroy(): void;
 }
 
@@ -93,36 +94,58 @@ function formatPyError(err: unknown): string {
   return lines[lines.length - 1] ?? text;
 }
 
+// Runs the student's code with stdout redirected into a StringIO, then
+// re-prints whatever it captured and exposes it as the `output` variable —
+// this lets teacher-written tests assert on printed text (`assert "Итого"
+// in output`) for beginner homeworks that only use variables/print, with no
+// function definitions required.
+const CAPTURE_STUDENT_OUTPUT = `
+import sys, io as __io
+__buf = __io.StringIO()
+__old_stdout = sys.stdout
+sys.stdout = __buf
+try:
+    exec(__student_code__)
+finally:
+    sys.stdout = __old_stdout
+output = __buf.getvalue()
+print(output, end="")
+`;
+
 /**
  * Runs the student's code followed by the teacher's assert-based test code
  * in a shared, fresh Python namespace, and captures everything printed to
- * stdout/stderr so it can be shown back to the student.
+ * stdout/stderr so it can be shown back to the student. The student's own
+ * printed output is also exposed to the test code as the `output` string,
+ * so tests can assert on it directly instead of requiring the student to
+ * define functions.
  */
 export async function runStudentCode(
   studentCode: string,
   testCode: string,
 ): Promise<RunResult> {
   const pyodide = await getPyodide();
-  let output = "";
+  let jsOutput = "";
   pyodide.setStdout({
     batched: (msg) => {
-      output += msg + "\n";
+      jsOutput += msg + "\n";
     },
   });
   pyodide.setStderr({
     batched: (msg) => {
-      output += msg + "\n";
+      jsOutput += msg + "\n";
     },
   });
 
   const namespace = pyodide.globals.get("dict")();
+  namespace.set("__student_code__", studentCode);
   try {
-    await pyodide.runPythonAsync(studentCode, { globals: namespace });
+    await pyodide.runPythonAsync(CAPTURE_STUDENT_OUTPUT, { globals: namespace });
     await pyodide.runPythonAsync(testCode, { globals: namespace });
-    return { passed: true, output: output.trim() };
+    return { passed: true, output: jsOutput.trim() };
   } catch (err) {
     const error = formatPyError(err);
-    return { passed: false, output: output.trim(), error, friendlyError: explainError(error) };
+    return { passed: false, output: jsOutput.trim(), error, friendlyError: explainError(error) };
   } finally {
     namespace.destroy();
   }

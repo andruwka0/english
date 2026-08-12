@@ -7,10 +7,10 @@ import { CodeEditor } from "@/components/CodeEditor";
 type FormState = { error?: string } | undefined;
 type FormAction = (state: FormState, formData: FormData) => Promise<FormState>;
 
-const DEFAULT_TEST_TEMPLATE = `# Пример: ученица должна написать функцию add(a, b)
-assert add(2, 3) == 5, "add(2, 3) должно быть равно 5"
-assert add(-1, 1) == 0, "add(-1, 1) должно быть равно 0"
-print("✅ Отлично, функция работает верно!")
+const DEFAULT_TEST_TEMPLATE = `# Пример: ученица просто печатает что-то через print(),
+# без функций — вся её печать доступна в переменной output.
+assert output.strip() == "Привет, мир!", "Должно быть напечатано: Привет, мир!"
+print("✅ Отлично, всё верно!")
 `;
 
 const inputCls =
@@ -107,9 +107,11 @@ export function HomeworkForm({
         <CodeEditor value={testCode} onChange={setTestCode} height="200px" />
         <input type="hidden" name="testCode" value={testCode} />
         <p className="text-xs text-ink-soft">
-          Тест выполняется сразу после кода ученицы в общем пространстве имён: используй в
-          нём функции/переменные, которые она должна определить, и {"assert"} с понятным
-          сообщением. Последняя строка теста, как правило, {"print(\"✅ ...\")"}.
+          Всё, что код ученицы напечатает через {"print()"}, доступно тесту в переменной{" "}
+          <code>output</code> (обычная строка) — этого достаточно, если задание не требует
+          писать функции ({"def"}). Также доступны все переменные, которые она создала.
+          Используй {"assert"} с понятным сообщением, последняя строка теста — обычно{" "}
+          {"print(\"✅ ...\")"}.
         </p>
       </div>
 
