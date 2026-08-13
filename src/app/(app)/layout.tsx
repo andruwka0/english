@@ -5,19 +5,19 @@ import { NavLinks } from "./NavLinks";
 
 export default async function AppLayout({ children }: LayoutProps<"/">) {
   const role = await requireRole();
-  const passedHomeworks = await prisma.submission.findMany({
+  const passedTasks = await prisma.submission.findMany({
     where: { passed: true },
-    distinct: ["homeworkId"],
-    select: { homeworkId: true },
+    distinct: ["taskId"],
+    select: { taskId: true },
   });
-  const stars = passedHomeworks.length;
+  const stars = passedTasks.length;
 
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur">
         <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">🐍</span>
+            <span className="text-2xl">🎓</span>
             <NavLinks />
           </div>
           <div className="flex items-center gap-3 text-sm">

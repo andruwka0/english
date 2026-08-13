@@ -4,15 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
-  { href: "/homework", label: "Домашки", emoji: "📝" },
-  { href: "/notes", label: "Конспекты", emoji: "📚" },
+  { href: "/courses/python", label: "Python", emoji: "🐍" },
+  { href: "/courses/english", label: "English", emoji: "🇬🇧" },
+  { href: "/vocabulary", label: "Словарик", emoji: "📖" },
+  { href: "/profile", label: "Профиль", emoji: "👤" },
 ] as const;
 
 export function NavLinks() {
   const pathname = usePathname();
 
   return (
-    <nav className="flex items-center gap-2">
+    <nav className="flex flex-wrap items-center gap-2">
       {LINKS.map((link) => {
         const active = pathname.startsWith(link.href);
         return (

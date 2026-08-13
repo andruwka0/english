@@ -37,10 +37,10 @@ export async function requireRole(): Promise<Role> {
   return session.role;
 }
 
-/** Redirects to /homework if the current session isn't a teacher. */
+/** Redirects to /courses/python if the current session isn't a teacher. */
 export async function requireTeacher(): Promise<void> {
   const role = await requireRole();
   if (role !== "teacher") {
-    redirect("/homework");
+    redirect("/courses/python");
   }
 }

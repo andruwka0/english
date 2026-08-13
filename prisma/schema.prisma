@@ -7,37 +7,88 @@ datasource db {
   provider = "postgresql"
 }
 
-model Note {
-  id        String   @id @default(cuid())
+enum CourseSlug {
+  python
+  english
+}
+
+enum TaskKind {
+  CODE
+  MATCHING
+  FILL_BLANK
+  MULTIPLE_CHOICE
+}
+
+model Course {
+  id      String     @id @default(cuid())
+  slug    CourseSlug @unique
+  title   String
+  icon    String
+  lessons Lesson[]
+}
+
+model Lesson {
+  id        String    @id @default(cuid())
+  courseId  String
+  course    Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  slug      String
   title     String
-  slug      String   @unique
   content   String
-  order     Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  order     Int       @default(0)
+  homework  Homework?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@unique([courseId, slug])
+  @@index([courseId])
 }
 
 model Homework {
+  id        String    @id @default(cuid())
+  lessonId  String    @unique
+  lesson    Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  deadline  DateTime?
+  tasks     Task[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Task {
   id          String       @id @default(cuid())
+  homeworkId  String
+  homework    Homework     @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
+  kind        TaskKind
   title       String
-  description String
-  starterCode String
-  testCode    String
+  prompt      String
+  data        Json
   maxAttempts Int?
   order       Int          @default(0)
+  submissions Submission[]
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
-  submissions Submission[]
+
+  @@index([homeworkId])
 }
 
 model Submission {
-  id           String   @id @default(cuid())
-  homeworkId   String
-  homework     Homework @relation(fields: [homeworkId], references: [id], onDelete: Cascade)
-  code         String
-  passed       Boolean
-  output       String
-  submittedAt  DateTime @default(now())
+  id          String   @id @default(cuid())
+  taskId      String
+  task        Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  passed      Boolean
+  code        String?
+  output      String?
+  answer      Json?
+  submittedAt DateTime @default(now())
 
-  @@index([homeworkId])
+  @@index([taskId])
+}
+
+model Word {
+  id          String   @id @default(cuid())
+  term        String
+  translation String
+  example     String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }

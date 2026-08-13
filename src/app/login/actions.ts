@@ -14,5 +14,5 @@ export async function login(_prevState: { error?: string } | undefined, formData
   const session = await getSession();
   session.role = role;
   await session.save();
-  redirect("/homework");
+  redirect("/courses/python");
 }
