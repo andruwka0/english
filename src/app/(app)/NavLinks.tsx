@@ -10,6 +10,8 @@ const LINKS = [
   { href: "/profile", label: "Профиль", emoji: "👤" },
 ] as const;
 
+const LESSON_CALL_URL = "https://centraluniversity.ktalk.ru/b3xeo4klg1aw";
+
 export function NavLinks() {
   const pathname = usePathname();
 
@@ -31,6 +33,14 @@ export function NavLinks() {
           </Link>
         );
       })}
+      <a
+        href={LESSON_CALL_URL}
+        target="_blank"
+        rel="noreferrer"
+        className="rounded-full px-4 py-2 text-sm font-bold text-ink-soft transition hover:bg-primary-soft hover:text-primary"
+      >
+        🎥 Урок
+      </a>
     </nav>
   );
 }
