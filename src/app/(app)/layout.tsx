@@ -15,12 +15,12 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   return (
     <div className="flex min-h-screen flex-col">
       <header className="sticky top-0 z-10 bg-white/80 backdrop-blur">
-        <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3">
-          <div className="flex items-center gap-3">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-2 py-3 sm:px-4">
+          <div className="flex min-w-0 items-center gap-2">
             <span className="text-2xl">🎓</span>
             <NavLinks />
           </div>
-          <div className="flex items-center gap-3 text-sm">
+          <div className="flex shrink-0 items-center gap-2 text-sm">
             <span className="rounded-full bg-teal-soft px-3 py-1.5 font-bold text-teal">
               ⭐ {stars}
             </span>
