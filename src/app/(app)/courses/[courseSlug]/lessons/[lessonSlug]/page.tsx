@@ -10,10 +10,14 @@ import { DeleteLessonButton } from "./DeleteLessonButton";
 
 export default async function LessonPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ courseSlug: string; lessonSlug: string }>;
+  searchParams: Promise<{ tab?: string | string[] }>;
 }) {
   const { courseSlug, lessonSlug } = await params;
+  const { tab } = await searchParams;
+  const activeTab = tab === "homework" ? "homework" : "content";
   const [session, lesson] = await Promise.all([
     getSession(),
     prisma.lesson.findFirst({
@@ -59,6 +63,28 @@ export default async function LessonPage({
             {lesson.course.icon} {lesson.course.title}
           </p>
           <h1 className="font-heading text-2xl font-bold text-ink">{lesson.title}</h1>
+          <div className="mt-3 flex flex-wrap gap-2 text-sm font-bold">
+            <Link
+              href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+              className={`rounded-full px-4 py-2 transition ${
+                activeTab === "content"
+                  ? "bg-primary text-white shadow-md shadow-primary/30"
+                  : "text-ink-soft hover:bg-primary-soft hover:text-primary"
+              }`}
+            >
+              📖 Конспект
+            </Link>
+            <Link
+              href={`/courses/${courseSlug}/lessons/${lesson.slug}?tab=homework`}
+              className={`rounded-full px-4 py-2 transition ${
+                activeTab === "homework"
+                  ? "bg-primary text-white shadow-md shadow-primary/30"
+                  : "text-ink-soft hover:bg-primary-soft hover:text-primary"
+              }`}
+            >
+              📝 Домашнее задание
+            </Link>
+          </div>
         </div>
         {session.role === "teacher" && (
           <div className="flex shrink-0 gap-3 text-sm font-bold">
@@ -73,17 +99,19 @@ export default async function LessonPage({
         )}
       </div>
 
-      <div className="rounded-3xl border-2 border-primary-soft bg-white p-6">
-        <MarkdownRenderer content={lesson.content} />
-      </div>
+      {activeTab === "content" && (
+        <div className="rounded-3xl border-2 border-primary-soft bg-white p-6">
+          <MarkdownRenderer content={lesson.content} />
+        </div>
+      )}
 
-      {lesson.homework && lesson.homework.deadline && (
+      {activeTab === "homework" && lesson.homework && lesson.homework.deadline && (
         <p className="rounded-2xl bg-teal-soft px-4 py-2 text-sm font-bold text-teal">
           📅 Дедлайн: {new Date(lesson.homework.deadline).toLocaleDateString("ru-RU")}
         </p>
       )}
 
-      {lesson.homework && lesson.homework.tasks.length > 0 && (
+      {activeTab === "homework" && lesson.homework && lesson.homework.tasks.length > 0 && (
         <section className="space-y-4">
           <h2 className="font-heading text-xl font-bold text-ink">📝 Домашка</h2>
           {lesson.homework.tasks.map((task, i) => (
@@ -101,7 +129,7 @@ export default async function LessonPage({
         </section>
       )}
 
-      {session.role === "teacher" && lesson.homework && lesson.homework.tasks.length > 0 && (
+      {activeTab === "homework" && session.role === "teacher" && lesson.homework && lesson.homework.tasks.length > 0 && (
         <section className="space-y-4">
           <h2 className="font-heading text-xl font-bold text-ink">📜 История сдач</h2>
           {lesson.homework.tasks.map((task) => (
