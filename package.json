@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "sync:curriculum": "tsx prisma/sync-curriculum.ts",
     "postinstall": "prisma generate"
   },
   "dependencies": {

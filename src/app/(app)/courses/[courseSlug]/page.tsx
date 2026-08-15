@@ -81,11 +81,18 @@ export default async function CoursePage({
         </p>
       ) : (
         <ul className="grid gap-4 sm:grid-cols-2">
-          {course.lessons.map((lesson) => {
+          {course.lessons.map((lesson, index) => {
             const tasks = lesson.homework?.tasks ?? [];
             const lessonPassed = tasks.filter((t) => t.submissions.some((s) => s.passed)).length;
+            const previousHomeworkDone = course.lessons.slice(0, index).every((previousLesson) => {
+              const previousTasks = previousLesson.homework?.tasks ?? [];
+              return previousTasks.every((task) => task.submissions.some((submission) => submission.passed));
+            });
+            const locked = session.role === "student" && !previousHomeworkDone;
             const status =
-              tasks.length === 0
+              locked
+                ? { label: "Сначала выполни прошлую домашку", emoji: "🔒", cls: "bg-slate-100 text-slate-600", border: "border-slate-200" }
+                : tasks.length === 0
                 ? { label: "Только конспект", emoji: "📖", cls: "bg-slate-100 text-slate-600", border: "border-slate-200" }
                 : lessonPassed === tasks.length
                   ? { label: "Сдано", emoji: "⭐", cls: "bg-success-soft text-success", border: "border-success/30" }
@@ -95,32 +102,56 @@ export default async function CoursePage({
 
             return (
               <li key={lesson.id}>
-                <Link
-                  href={`/courses/${course.slug}/lessons/${lesson.slug}`}
-                  className={`wiggle-hover flex h-full flex-col justify-between gap-3 rounded-3xl border-2 bg-white p-5 shadow-sm transition ${status.border}`}
-                >
-                  <span className="font-heading text-lg font-bold text-ink">{lesson.title}</span>
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className={`rounded-full px-3 py-1 font-bold ${status.cls}`}>
-                      {status.emoji} {status.label}
-                    </span>
-                    {tasks.length > 0 && (
-                      <span className="rounded-full bg-primary-soft px-3 py-1 font-bold text-primary">
-                        {lessonPassed} / {tasks.length} заданий
-                      </span>
-                    )}
-                    {lesson.homework?.deadline && (
-                      <span className="rounded-full bg-teal-soft px-3 py-1 font-bold text-teal">
-                        📅 до {new Date(lesson.homework.deadline).toLocaleDateString("ru-RU")}
-                      </span>
-                    )}
+                {locked ? (
+                  <div className={`flex h-full flex-col justify-between gap-3 rounded-3xl border-2 bg-white/60 p-5 shadow-sm ${status.border}`}>
+                    <LessonCardContent lesson={lesson} lessonPassed={lessonPassed} tasks={tasks} status={status} />
                   </div>
-                </Link>
+                ) : (
+                  <Link
+                    href={`/courses/${course.slug}/lessons/${lesson.slug}`}
+                    className={`wiggle-hover flex h-full flex-col justify-between gap-3 rounded-3xl border-2 bg-white p-5 shadow-sm transition ${status.border}`}
+                  >
+                    <LessonCardContent lesson={lesson} lessonPassed={lessonPassed} tasks={tasks} status={status} />
+                  </Link>
+                )}
               </li>
             );
           })}
         </ul>
       )}
     </div>
+  );
+}
+
+function LessonCardContent({
+  lesson,
+  lessonPassed,
+  tasks,
+  status,
+}: {
+  lesson: { title: string; homework: { deadline: Date | null } | null };
+  lessonPassed: number;
+  tasks: unknown[];
+  status: { label: string; emoji: string; cls: string };
+}) {
+  return (
+    <>
+      <span className="font-heading text-lg font-bold text-ink">{lesson.title}</span>
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className={`rounded-full px-3 py-1 font-bold ${status.cls}`}>
+          {status.emoji} {status.label}
+        </span>
+        {tasks.length > 0 && (
+          <span className="rounded-full bg-primary-soft px-3 py-1 font-bold text-primary">
+            {lessonPassed} / {tasks.length} заданий
+          </span>
+        )}
+        {lesson.homework?.deadline && (
+          <span className="rounded-full bg-teal-soft px-3 py-1 font-bold text-teal">
+            📅 до {new Date(lesson.homework.deadline).toLocaleDateString("ru-RU")}
+          </span>
+        )}
+      </div>
+    </>
   );
 }

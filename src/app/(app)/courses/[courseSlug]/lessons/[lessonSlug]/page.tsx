@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { getSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { MarkdownRenderer } from "@/components/MarkdownRenderer";
@@ -33,6 +33,17 @@ export default async function LessonPage({
   ]);
 
   if (!lesson) notFound();
+
+  if (session.role === "student") {
+    const previousLessons = await prisma.lesson.findMany({
+      where: { courseId: lesson.courseId, order: { lt: lesson.order } },
+      include: { homework: { include: { tasks: { include: { submissions: { select: { passed: true } } } } } } },
+    });
+    const blocked = previousLessons.some((previousLesson) =>
+      (previousLesson.homework?.tasks ?? []).some((task) => !task.submissions.some((submission) => submission.passed)),
+    );
+    if (blocked) redirect(`/courses/${courseSlug}`);
+  }
 
   return (
     <div className="space-y-8">
