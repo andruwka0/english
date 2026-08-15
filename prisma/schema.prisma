@@ -89,6 +89,7 @@ model RewardItem {
   description String?
   price       Int
   stock       Int
+  isActive    Boolean          @default(true)
   purchases   RewardPurchase[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt

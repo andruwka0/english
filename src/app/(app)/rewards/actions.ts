@@ -20,6 +20,14 @@ export async function createRewardItem(formData: FormData) {
   redirectWithNotice("Предмет добавлен в магазин.");
 }
 
+export async function deleteRewardItem(rewardItemId: string) {
+  await requireTeacher();
+  await prisma.rewardItem.update({ where: { id: rewardItemId }, data: { isActive: false } });
+  revalidatePath("/rewards");
+  revalidatePath("/profile");
+  redirectWithNotice("Предмет удален из магазина. История покупок сохранена.");
+}
+
 export async function purchaseRewardItem(rewardItemId: string) {
   const session = await getSession();
   if (session.role !== "student") redirectWithNotice("Покупки доступны только ученице.");
@@ -28,9 +36,10 @@ export async function purchaseRewardItem(rewardItemId: string) {
       const [passedTasks, spent, item] = await Promise.all([
         tx.submission.findMany({ where: { passed: true }, distinct: ["taskId"], select: { taskId: true } }),
         tx.rewardPurchase.aggregate({ _sum: { pricePaid: true } }),
-        tx.rewardItem.findUnique({ where: { id: rewardItemId }, select: { id: true, price: true, stock: true } }),
+        tx.rewardItem.findUnique({ where: { id: rewardItemId }, select: { id: true, price: true, stock: true, isActive: true } }),
       ]);
       if (!item) return "Предмет больше недоступен.";
+      if (!item.isActive) return "Этот предмет больше недоступен.";
       if (item.stock < 1) return "Этот предмет уже закончился.";
       if (passedTasks.length - (spent._sum.pricePaid ?? 0) < item.price) return "Пока не хватает звезд.";
       const updated = await tx.rewardItem.updateMany({ where: { id: item.id, stock: { gt: 0 } }, data: { stock: { decrement: 1 } } });
