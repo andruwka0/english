@@ -6,34 +6,35 @@
   --font-sans: var(--font-body);
   --font-heading: var(--font-heading);
   --font-mono: var(--font-geist-mono);
-
-  --color-cream: #fff8ec;
-  --color-primary: #7c5cfc;
-  --color-primary-dark: #6a3ff0;
-  --color-primary-soft: #ede6ff;
-  --color-pink: #ff6fa5;
-  --color-pink-soft: #ffe4ef;
-  --color-yellow: #ffc845;
-  --color-yellow-soft: #fff3d6;
-  --color-teal: #2fc2b8;
-  --color-teal-soft: #dcfaf6;
+  --color-cream: #f6f8fc;
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+  --color-primary-soft: #dbeafe;
+  --color-pink: #f97360;
+  --color-pink-soft: #ffebe7;
+  --color-yellow: #fbbf24;
+  --color-yellow-soft: #fef3c7;
+  --color-teal: #0f9f8c;
+  --color-teal-soft: #d7f7ef;
   --color-success: #22c55e;
   --color-success-soft: #dcfce7;
   --color-danger: #ff6b6b;
   --color-danger-soft: #ffe6e6;
-  --color-ink: #372f5c;
-  --color-ink-soft: #7d759c;
+  --color-ink: #172554;
+  --color-ink-soft: #64748b;
 }
 
-body {
-  background:
-    radial-gradient(circle at 8% 8%, color-mix(in srgb, var(--color-yellow) 22%, transparent) 0%, transparent 40%),
-    radial-gradient(circle at 95% 15%, color-mix(in srgb, var(--color-pink) 18%, transparent) 0%, transparent 42%),
-    radial-gradient(circle at 90% 92%, color-mix(in srgb, var(--color-teal) 20%, transparent) 0%, transparent 45%),
-    var(--color-cream);
-  background-attachment: fixed;
+body { background: var(--color-cream); }
+
+.glass-surface {
+  background: rgb(255 255 255 / 72%);
+  border: 1px solid rgb(255 255 255 / 72%);
+  box-shadow: 0 12px 28px rgb(15 23 42 / 8%);
+  -webkit-backdrop-filter: blur(18px) saturate(145%);
+  backdrop-filter: blur(18px) saturate(145%);
 }
 
-.wiggle-hover:hover {
-  transform: rotate(-1deg) scale(1.03);
+.course-grid {
+  background-image: linear-gradient(rgb(37 99 235 / 4%) 1px, transparent 1px), linear-gradient(90deg, rgb(37 99 235 / 4%) 1px, transparent 1px);
+  background-size: 32px 32px;
 }

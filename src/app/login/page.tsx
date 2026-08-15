@@ -14,9 +14,9 @@ export default function LoginPage() {
         className="w-full max-w-sm space-y-5 rounded-[2rem] border-4 border-primary-soft bg-white p-8 shadow-xl shadow-primary/10"
       >
         <div className="space-y-2 text-center">
-          <div className="text-5xl">🐍✨</div>
-          <h1 className="font-heading text-2xl font-bold text-primary">Python с нуля</h1>
-          <p className="text-sm text-ink-soft">Введи пароль, чтобы продолжить</p>
+          <div className="text-5xl">M</div>
+          <h1 className="font-heading text-2xl font-bold text-primary">My Study</h1>
+          <p className="text-sm text-ink-soft">Python и английский в одном личном кабинете</p>
         </div>
 
         <div className="space-y-2">

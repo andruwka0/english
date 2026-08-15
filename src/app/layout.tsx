@@ -20,8 +20,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Python с нуля 🐍",
-  description: "Конспекты и домашки для изучения Python",
+  title: "My Study",
+  description: "Личный кабинет для учебы",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

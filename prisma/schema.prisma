@@ -83,6 +83,27 @@ model Submission {
   @@index([taskId])
 }
 
+model RewardItem {
+  id          String           @id @default(cuid())
+  title       String
+  description String?
+  price       Int
+  stock       Int
+  purchases   RewardPurchase[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+}
+
+model RewardPurchase {
+  id           String     @id @default(cuid())
+  rewardItemId String
+  rewardItem   RewardItem @relation(fields: [rewardItemId], references: [id], onDelete: Cascade)
+  pricePaid    Int
+  purchasedAt  DateTime   @default(now())
+
+  @@index([rewardItemId])
+}
+
 model Word {
   id          String   @id @default(cuid())
   term        String
