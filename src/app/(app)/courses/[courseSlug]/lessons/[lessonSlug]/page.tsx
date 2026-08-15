@@ -38,6 +38,12 @@ export default async function LessonPage({
     <div className="space-y-8">
       <div className="flex items-start justify-between gap-4">
         <div>
+          <Link
+            href={`/courses/${courseSlug}`}
+            className="mb-2 inline-flex rounded-full px-3 py-1.5 text-sm font-bold text-ink-soft transition hover:bg-primary-soft hover:text-primary"
+          >
+            ← К курсу
+          </Link>
           <p className="text-sm font-bold text-ink-soft">
             {lesson.course.icon} {lesson.course.title}
           </p>

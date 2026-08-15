@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireTeacher } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +25,7 @@ export default async function EditLessonPage({
 
   const initialTasks: TaskDraft[] = (lesson.homework?.tasks ?? []).map((t) => ({
     localId: t.id,
+    dbId: t.id,
     kind: t.kind as TaskKindValue,
     title: t.title,
     prompt: t.prompt,
@@ -39,7 +41,15 @@ export default async function EditLessonPage({
 
   return (
     <div className="space-y-6">
-      <h1 className="font-heading text-2xl font-bold text-ink">✏️ Редактировать урок</h1>
+      <div className="space-y-2">
+        <Link
+          href={`/courses/${courseSlug}/lessons/${lesson.slug}`}
+          className="inline-flex rounded-full px-3 py-1.5 text-sm font-bold text-ink-soft transition hover:bg-primary-soft hover:text-primary"
+        >
+          ← К уроку
+        </Link>
+        <h1 className="font-heading text-2xl font-bold text-ink">✏️ Редактировать урок</h1>
+      </div>
       <LessonForm
         action={boundSave}
         submitLabel="Сохранить"
