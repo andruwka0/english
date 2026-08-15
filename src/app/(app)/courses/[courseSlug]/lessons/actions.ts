@@ -94,9 +94,16 @@ export async function saveLesson(
       const keptTaskIds = taskData.flatMap((task) =>
         task.dbId && existingTaskIds.has(task.dbId) ? [task.dbId] : [],
       );
+      const deletedTaskIds = existingTasks
+        .filter((task) => !keptTaskIds.includes(task.id))
+        .map((task) => task.id);
 
       await prisma.$transaction(async (tx) => {
         await tx.homework.update({ where: { id: existing.homework!.id }, data: { deadline } });
+
+        if (deletedTaskIds.length > 0) {
+          await tx.task.deleteMany({ where: { id: { in: deletedTaskIds } } });
+        }
 
         for (const task of taskData) {
           const { dbId, ...data } = task;
@@ -107,16 +114,18 @@ export async function saveLesson(
           }
         }
 
-        await tx.task.deleteMany({
-          where: { homeworkId: existing.homework!.id, id: { notIn: keptTaskIds } },
-        });
       });
     } else {
       await prisma.homework.create({
         data: {
           lessonId: existing.id,
           deadline,
-          tasks: { create: taskData.map(({ dbId: _dbId, ...task }) => task) },
+          tasks: {
+            create: taskData.map(({ dbId, ...task }) => {
+              void dbId;
+              return task;
+            }),
+          },
         },
       });
     }
@@ -136,7 +145,17 @@ export async function saveLesson(
         title,
         content,
         order: (maxOrder._max.order ?? 0) + 1,
-        homework: { create: { deadline, tasks: { create: taskData.map(({ dbId: _dbId, ...task }) => task) } } },
+        homework: {
+          create: {
+            deadline,
+            tasks: {
+              create: taskData.map(({ dbId, ...task }) => {
+                void dbId;
+                return task;
+              }),
+            },
+          },
+        },
       },
     });
     slug = created.slug;
