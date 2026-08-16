@@ -12,6 +12,7 @@ export function TaskRunner({
   data,
   maxAttempts,
   attemptsUsed,
+  passedCode,
   index,
 }: {
   taskId: string;
@@ -20,6 +21,7 @@ export function TaskRunner({
   data: TaskData;
   maxAttempts: number | null;
   attemptsUsed: number;
+  passedCode: string | null;
   index: number;
 }) {
   return (
@@ -34,7 +36,7 @@ export function TaskRunner({
       )}
 
       {data.kind === "CODE" && (
-        <CodeTask taskId={taskId} data={data} maxAttempts={maxAttempts} attemptsUsed={attemptsUsed} />
+        <CodeTask taskId={taskId} data={data} maxAttempts={maxAttempts} attemptsUsed={attemptsUsed} passedCode={passedCode} />
       )}
       {data.kind === "MATCHING" && (
         <MatchingTask taskId={taskId} data={data} maxAttempts={maxAttempts} attemptsUsed={attemptsUsed} />

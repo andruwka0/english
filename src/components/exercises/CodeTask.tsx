@@ -12,12 +12,24 @@ export function CodeTask({
   data,
   maxAttempts,
   attemptsUsed,
+  passedCode,
 }: {
   taskId: string;
   data: Extract<TaskData, { kind: "CODE" }>;
   maxAttempts: number | null;
   attemptsUsed: number;
+  passedCode: string | null;
 }) {
+  if (passedCode !== null) {
+    return (
+      <div className="rounded-xl border border-success/30 bg-success-soft p-4">
+        <p className="font-bold text-success">Задание выполнено</p>
+        <p className="mt-1 text-sm text-ink-soft">Твое правильное решение:</p>
+        <pre className="mt-3 overflow-x-auto rounded-lg bg-ink p-3 text-xs text-white">{passedCode}</pre>
+      </div>
+    );
+  }
+
   const [code, setCode] = useState(data.starterCode);
   const [running, setRunning] = useState(false);
   const [pyodideLoading, setPyodideLoading] = useState(false);

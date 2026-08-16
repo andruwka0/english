@@ -114,18 +114,22 @@ export default async function LessonPage({
       {activeTab === "homework" && lesson.homework && lesson.homework.tasks.length > 0 && (
         <section className="space-y-4">
           <h2 className="font-heading text-xl font-bold text-ink">📝 Домашка</h2>
-          {lesson.homework.tasks.map((task, i) => (
-            <TaskRunner
-              key={task.id}
-              taskId={task.id}
-              title={task.title}
-              prompt={task.prompt}
-              data={task.data as TaskData}
-              maxAttempts={task.maxAttempts}
-              attemptsUsed={task.submissions.length}
-              index={i}
-            />
-          ))}
+          {lesson.homework.tasks.map((task, i) => {
+            const passedSubmission = task.submissions.find((submission) => submission.passed);
+            return (
+              <TaskRunner
+                key={task.id}
+                taskId={task.id}
+                title={task.title}
+                prompt={task.prompt}
+                data={task.data as TaskData}
+                maxAttempts={task.maxAttempts}
+                attemptsUsed={task.submissions.length}
+                passedCode={passedSubmission?.code ?? null}
+                index={i}
+              />
+            );
+          })}
         </section>
       )}
 
