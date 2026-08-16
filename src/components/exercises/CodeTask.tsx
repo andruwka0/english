@@ -20,6 +20,15 @@ export function CodeTask({
   attemptsUsed: number;
   passedCode: string | null;
 }) {
+  const [code, setCode] = useState(data.starterCode);
+  const [running, setRunning] = useState(false);
+  const [pyodideLoading, setPyodideLoading] = useState(false);
+  const [result, setResult] = useState<RunResult | null>(null);
+  const [used, setUsed] = useState(attemptsUsed);
+  const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
+
   if (passedCode !== null) {
     return (
       <div className="rounded-xl border border-success/30 bg-success-soft p-4">
@@ -29,15 +38,6 @@ export function CodeTask({
       </div>
     );
   }
-
-  const [code, setCode] = useState(data.starterCode);
-  const [running, setRunning] = useState(false);
-  const [pyodideLoading, setPyodideLoading] = useState(false);
-  const [result, setResult] = useState<RunResult | null>(null);
-  const [used, setUsed] = useState(attemptsUsed);
-  const [submitted, setSubmitted] = useState(false);
-  const [submitError, setSubmitError] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
 
   const attemptsLeft = maxAttempts !== null ? Math.max(maxAttempts - used, 0) : null;
   const limitReached = attemptsLeft !== null && attemptsLeft <= 0;
