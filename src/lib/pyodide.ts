@@ -100,6 +100,7 @@ function formatPyError(err: unknown): string {
 // in output`) for beginner homeworks that only use variables/print, with no
 // function definitions required.
 const CAPTURE_STUDENT_OUTPUT = `
+import ast as __ast
 import sys, io as __io
 __buf = __io.StringIO()
 __old_stdout = sys.stdout
@@ -110,6 +111,34 @@ finally:
     sys.stdout = __old_stdout
 output = __buf.getvalue()
 print(output, end="")
+
+# Teacher tests can re-run the same solution with replacement values for
+# top-level starter variables. This keeps beginner tasks function-free while
+# still letting a test check more than one example.
+def run_case(**__case_values):
+    __case_tree = __ast.parse(__student_code__)
+    for __case_node in __case_tree.body:
+        if (
+            isinstance(__case_node, __ast.Assign)
+            and len(__case_node.targets) == 1
+            and isinstance(__case_node.targets[0], __ast.Name)
+            and __case_node.targets[0].id in __case_values
+        ):
+            __case_node.value = __ast.Subscript(
+                value=__ast.Name(id="__case_values__", ctx=__ast.Load()),
+                slice=__ast.Constant(value=__case_node.targets[0].id),
+                ctx=__ast.Load(),
+            )
+    __ast.fix_missing_locations(__case_tree)
+    __case_output = __io.StringIO()
+    __case_stdout = sys.stdout
+    __case_namespace = {"__case_values__": __case_values}
+    sys.stdout = __case_output
+    try:
+        exec(compile(__case_tree, "<student code>", "exec"), __case_namespace)
+    finally:
+        sys.stdout = __case_stdout
+    return __case_output.getvalue(), __case_namespace
 `;
 
 /**

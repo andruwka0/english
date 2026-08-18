@@ -55,6 +55,20 @@ export default async function CoursePage({
         )}
       </div>
 
+      {course.slug === "python" && (
+        <nav className="flex w-fit rounded-2xl border border-primary-soft bg-white/70 p-1 text-sm font-bold shadow-sm">
+          <Link href={`/courses/${course.slug}`} className="rounded-xl bg-primary px-4 py-2 text-white shadow-sm">
+            Уроки
+          </Link>
+          <Link
+            href={`/courses/${course.slug}/projects`}
+            className="rounded-xl px-4 py-2 text-ink-soft transition hover:bg-primary-soft hover:text-primary"
+          >
+            Проекты
+          </Link>
+        </nav>
+      )}
+
       {total > 0 && (
         <div className="space-y-2 rounded-3xl border-2 border-primary-soft bg-white p-5">
           <div className="flex items-center justify-between text-sm font-bold text-ink">
@@ -152,6 +166,7 @@ function LessonCardContent({
           </span>
         )}
       </div>
+
     </>
   );
 }

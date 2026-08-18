@@ -20,11 +20,12 @@ enum TaskKind {
 }
 
 model Course {
-  id      String     @id @default(cuid())
-  slug    CourseSlug @unique
-  title   String
-  icon    String
-  lessons Lesson[]
+  id       String     @id @default(cuid())
+  slug     CourseSlug @unique
+  title    String
+  icon     String
+  lessons  Lesson[]
+  projects Project[]
 }
 
 model Lesson {
@@ -38,6 +39,22 @@ model Lesson {
   homework  Homework?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+
+  @@unique([courseId, slug])
+  @@index([courseId])
+}
+
+model Project {
+  id            String   @id @default(cuid())
+  courseId      String
+  course        Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  slug          String
+  title         String
+  topic         String
+  specification String
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@unique([courseId, slug])
   @@index([courseId])
