@@ -13,7 +13,15 @@ type LessonDefinition = {
   replaceTasks?: boolean;
   refreshTasks?: boolean;
 };
-type ProjectDefinition = { slug: string; title: string; topic: string; specification: string; order: number };
+type ProjectDefinition = {
+  slug: string;
+  title: string;
+  topic: string;
+  specification: string;
+  starterCode: string;
+  testCode: string;
+  order: number;
+};
 const task = (title: string, prompt: string, starterCode: string, testCode: string): CodeTask => ({ title, prompt, starterCode, testCode });
 
 const lessons: LessonDefinition[] = [
@@ -92,7 +100,7 @@ const projects: ProjectDefinition[] = [
 
 Сделай консольный калькулятор.
 
-1. Спроси у пользователя первое число, второе число и знак операции: \`+\`, \`-\`, \`*\` или \`/\`.
+1. Спроси у пользователя первое число, знак операции и второе число: \`+\`, \`-\`, \`*\` или \`/\`.
 2. Для каждого знака посчитай и выведи результат.
 3. Если введен незнакомый знак, напечатай: \`Такой операции нет\`.
 4. Не дели на ноль: в этом случае напечатай понятное сообщение.
@@ -106,6 +114,27 @@ const projects: ProjectDefinition[] = [
 ### Пример
 
 Если введены \`8\`, \`*\` и \`3\`, программа печатает \`24\`.`,
+    starterCode: `# Консольный калькулятор
+first = float(input("Первое число: "))
+operation = input("Операция: ")
+second = float(input("Второе число: "))
+
+# Напиши проверку операции и выведи результат
+`,
+    testCode: `for inputs, expected in [
+    (['8', '*', '3'], 24),
+    (['10', '-', '7'], 3),
+    (['5', '+', '6'], 11),
+    (['20', '/', '4'], 5),
+]:
+    case_output, _ = run_case(inputs=inputs)
+    assert float(case_output.strip().split()[-1]) == expected
+
+case_output, _ = run_case(inputs=['7', '/', '0'])
+assert 'нол' in case_output.lower()
+
+case_output, _ = run_case(inputs=['7', '^', '2'])
+assert 'операц' in case_output.lower()`,
   },
   {
     slug: "multiplication-table",
@@ -123,6 +152,18 @@ const projects: ProjectDefinition[] = [
 ### Дополнение
 
 Попроси пользователя выбрать, до какого числа строить таблицу, а не используй только 10.`,
+    starterCode: `number = int(input("Число: "))
+limit = int(input("До какого множителя: "))
+
+# Напечатай таблицу умножения
+`,
+    testCode: `for inputs, expected in [
+    (['7', '3'], ['7 * 1 = 7', '7 * 2 = 14', '7 * 3 = 21']),
+    (['2', '1'], ['2 * 1 = 2']),
+    (['-3', '4'], ['-3 * 1 = -3', '-3 * 2 = -6', '-3 * 3 = -9', '-3 * 4 = -12']),
+]:
+    case_output, _ = run_case(inputs=inputs)
+    assert case_output.strip().splitlines() == expected`,
   },
   {
     slug: "money-box",
@@ -142,6 +183,20 @@ const projects: ProjectDefinition[] = [
 
 - Цикл должен завершаться, когда накоплено ровно столько, сколько нужно, или больше.
 - Программа не должна зацикливаться: внутри \`while\` обязательно меняй сумму.`,
+    starterCode: `goal = int(input("Цель: "))
+saved = 0
+
+# В цикле while спрашивай, сколько добавить в копилку
+`,
+    testCode: `for inputs, expected in [
+    (['10', '3', '4', '3'], 10),
+    (['7', '8'], 8),
+    (['15', '5', '6', '7'], 18),
+]:
+    case_output, values = run_case(inputs=inputs)
+    assert values['saved'] == expected
+    assert str(expected) in case_output
+    assert 'цель' in case_output.lower()`,
   },
   {
     slug: "shopping-list",
@@ -160,6 +215,20 @@ const projects: ProjectDefinition[] = [
 ### Дополнение
 
 Перед выводом добавь нумерацию: \`1. хлеб\`, \`2. молоко\` и так далее.`,
+    starterCode: `items = ['хлеб', 'молоко', 'яблоки']
+
+# Добавь одну покупку, выведи количество и весь список через for
+`,
+    testCode: `for items in [
+    ['хлеб', 'молоко', 'яблоки'],
+    ['чай'],
+    ['карандаш', 'тетрадь'],
+]:
+    case_output, values = run_case(items=items)
+    assert len(values['items']) == len(items) + 1
+    assert str(len(items) + 1) in case_output
+    for item in values['items']:
+        assert item in case_output`,
   },
 ];
 
@@ -203,7 +272,14 @@ async function main() {
   for (const definition of projects) {
     await prisma.project.upsert({
       where: { courseId_slug: { courseId: course.id, slug: definition.slug } },
-      update: { title: definition.title, topic: definition.topic, specification: definition.specification, order: definition.order },
+      update: {
+        title: definition.title,
+        topic: definition.topic,
+        specification: definition.specification,
+        starterCode: definition.starterCode,
+        testCode: definition.testCode,
+        order: definition.order,
+      },
       create: { courseId: course.id, ...definition },
     });
   }

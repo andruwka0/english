@@ -104,18 +104,20 @@ import ast as __ast
 import sys, io as __io
 __buf = __io.StringIO()
 __old_stdout = sys.stdout
-sys.stdout = __buf
-try:
-    exec(__student_code__)
-finally:
-    sys.stdout = __old_stdout
-output = __buf.getvalue()
-print(output, end="")
+output = ""
+if "input(" not in __student_code__:
+    sys.stdout = __buf
+    try:
+        exec(__student_code__)
+    finally:
+        sys.stdout = __old_stdout
+    output = __buf.getvalue()
+    print(output, end="")
 
 # Teacher tests can re-run the same solution with replacement values for
 # top-level starter variables. This keeps beginner tasks function-free while
 # still letting a test check more than one example.
-def run_case(**__case_values):
+def run_case(inputs=None, **__case_values):
     __case_tree = __ast.parse(__student_code__)
     for __case_node in __case_tree.body:
         if (
@@ -133,6 +135,13 @@ def run_case(**__case_values):
     __case_output = __io.StringIO()
     __case_stdout = sys.stdout
     __case_namespace = {"__case_values__": __case_values}
+    __case_inputs = iter([] if inputs is None else inputs)
+    def __case_input(prompt=""):
+        try:
+            return next(__case_inputs)
+        except StopIteration:
+            raise AssertionError("Программа запросила больше данных, чем было в тесте")
+    __case_namespace["input"] = __case_input
     sys.stdout = __case_output
     try:
         exec(compile(__case_tree, "<student code>", "exec"), __case_namespace)
